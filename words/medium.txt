@@ -1,0 +1,8 @@
+adventure
+captain
+library
+machine
+puzzle
+rocket
+silver
+thunder

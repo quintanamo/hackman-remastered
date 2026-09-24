@@ -1,0 +1,8 @@
+apple
+banana
+cloud
+dragon
+forest
+grape
+planet
+sunset

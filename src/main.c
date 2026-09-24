@@ -2,6 +2,8 @@
 #include <conio.h>
 #include <dos.h>
 
+#include "word_list.h"
+
 #define SCREEN_LEFT_PAD "                "
 
 static void set_cursor_visibility(int visible) {
@@ -51,9 +53,27 @@ void draw_difficulty_selection(int selected) {
     }
 }
 
+const char *load_selected_word(int difficulty) {
+    static const char *paths[] = {
+        "..\\words\\easy.txt",
+        "..\\words\\medium.txt",
+        "..\\words\\hard.txt"
+    };
+    static WordList list;
+    static const char *selected_word = "";
+
+    if (load_word_list(paths[difficulty], &list)) {
+        selected_word = pick_random_word(&list);
+        return selected_word;
+    }
+
+    return "";
+}
+
 int main(void) {
     int difficulty = 0;
     int key;
+    const char *selected_word;
 
     printf("\x1B[2J\x1B[H"); // clear console
     printf("\x1B[32m"); // set color to green
@@ -67,9 +87,7 @@ int main(void) {
     // handle setting the difficulty
     for (;;) {
         draw_difficulty_selection(difficulty);
-
         key = getch();
-
         if (key == 0 || key == 224) {
             key = getch();
             if (key == 72) {
@@ -82,9 +100,22 @@ int main(void) {
         }
     }
 
+    printf("\x1B[2J\x1B[H"); // clear console
+    
+    // select a word based on the chosen difficulty
+    selected_word = load_selected_word(difficulty);
+    if (selected_word[0] != '\0') {
+        printf(SCREEN_LEFT_PAD "Word: %s\n", selected_word);
+    } else {
+        printf(SCREEN_LEFT_PAD "Could not load words for the selected difficulty.\n");
+    }
+
+    while (getch() != ' ') {
+        // wait until the user presses SPACE to start the game
+    }
+
     set_cursor_visibility(1); // reset cursor
     printf("\x1B[0m"); // reset color
     printf("\x1B[2J\x1B[H"); // clear console
-    printf(SCREEN_LEFT_PAD "Selected difficulty: %s\n", (difficulty == 0) ? "Easy" : (difficulty == 1) ? "Medium" : "Hard");
     return 0;
 }
